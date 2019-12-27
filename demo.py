@@ -14,6 +14,7 @@ root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 
 extension = StringVar()
+check_immediate = IntVar()
 filename = ""
 
 
@@ -26,14 +27,22 @@ def filedisp():
 def final_del():
     global filename
     get_ext = extension.get()
+    remove_dir = os.listdir(filename)
+    print(remove_dir)
 
     response = tkinter.messagebox.askquestion("Confirm", "Sure to delete - \n " + filename)
 
-    if response == 'yes':
+    if response == 'yes' and not check_immediate.get():
         for parent, dirnames, filenames in os.walk(filename):
             for fn in filenames:
                 if fn.lower().endswith(get_ext):
                     os.remove(os.path.join(parent, fn))
+
+    elif response == 'yes' and check_immediate.get():
+        for item in remove_dir:
+            if item.endswith(get_ext):
+                os.remove(os.path.join(filename, item))
+
 
         ttk.Label(mainframe, text="Succesfully Deleted").grid(column=3, row=4, sticky=W, pady=10)
 
@@ -46,6 +55,8 @@ e1.bind("<Return>", final_del)
 
 ttk.Button(mainframe, text="Browse a File", command=filedisp).grid(column=2, row=2, pady=10)
 ttk.Button(mainframe, text="DELETE", command=final_del).grid(column=2, row=3, pady=10)
+
+c_only_this_dir = ttk.Checkbutton(mainframe, text="Don't delete in subdirectories", variable=check_immediate).grid(column=1, row=3)
 
 
 root.mainloop()
